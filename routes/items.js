@@ -1,12 +1,14 @@
 const router = require('express').Router()
 const db = require('../db/database')
 const selectColumnsFrom = require('../queries/selectColumnsFrom')
+const insertInto = require('../queries/insertInto')
 const selectColumnsFromWhereLike = require('../queries/selectColumnsFromWhereLike')
+const deleteFromWhereIdEquals = require('../queries/deleteFromWhereIdEquals')
 
 router.get('/', (req, res) => {
-  let sql = selectColumnsFrom(['rowid', '*'], 'item')
+  let query = selectColumnsFrom(['rowid', '*'], 'item')
   
-  db.all(sql, (err, rows) => {
+  db.all(query, (err, rows) => {
     if (err) {
       console.error(err.message)
       res.sendStatus(500)
@@ -17,14 +19,28 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-    // izvuci objekt iz req.body
-    res.send('Post!')
+  let query = insertInto('item', [
+    req.body.name,
+    req.body.category,
+    req.body.status,
+    req.body.manufacturer,
+    req.body.location
+  ])
+
+  db.run(query, function(err) {
+    if (err) {
+      console.error(err.message)
+      res.sendStatus(500)
+    } else {
+      res.send(`${this.lastID}`)
+    }
+  })
 })
 
 router.get('/:filter', (req, res) => {
-  let sql = selectColumnsFromWhereLike(['*'], 'item', 'name', req.params.filter)
+  let query = selectColumnsFromWhereLike(['rowid', '*'], 'item', 'name', req.params.filter)
   
-  db.all(sql, (err, rows) => {
+  db.all(query, (err, rows) => {
     if (err) {
       console.error(err.message)
       res.sendStatus(500)
@@ -34,8 +50,17 @@ router.get('/:filter', (req, res) => {
   })
 })
 
-router.delete('/', (req, res) => {
-    res.send('Delete!')
+router.delete('/:id', (req, res) => {
+  let query = deleteFromWhereIdEquals('item', req.params.id)
+
+  db.run(query, (err) => {
+    if (err) {
+      console.error(err.message)
+      res.sendStatus(500)
+    } else {
+      res.sendStatus(200)
+    }
+  });
 })
 
 module.exports = router
