@@ -13,7 +13,20 @@ router.get('/', (req, res) => {
       console.error(err.message)
       res.sendStatus(500)
     } else {
-      res.send(rows)
+      let itemsModel = []
+
+      for (let i = 0; i < rows.length; i++) {
+        itemsModel.push({
+          id: rows[i].rowid,
+          name: rows[i].name,
+          category: rows[i].category,
+          status: rows[i].status,
+          manufacturer: rows[i].manufacturer,
+          location: rows[i].location
+        })
+      }
+
+      res.send(itemsModel)
     }
   })
 })
@@ -45,7 +58,20 @@ router.get('/:filter', (req, res) => {
       console.error(err.message)
       res.sendStatus(500)
     } else {
-      res.send(rows)
+      let itemsModel = []
+
+      for (let i = 0; i < rows.length; i++) {
+        itemsModel.push({
+          id: rows[i].rowid,
+          name: rows[i].name,
+          category: rows[i].category,
+          status: rows[i].status,
+          manufacturer: rows[i].manufacturer,
+          location: rows[i].location
+        })
+      }
+      
+      res.send(itemsModel)
     }
   })
 })
